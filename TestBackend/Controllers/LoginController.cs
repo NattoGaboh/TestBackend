@@ -26,7 +26,7 @@ namespace TestBackend.Controllers
                 {
                     return BadRequest(new { message = "Usuario o contraseña inválida" });
                 }
-                return Ok(new { message = "xXx" });
+                return Ok(new { usuario = usr.NameUser });
             }
             catch (Exception ex)
             {
