@@ -12,7 +12,7 @@ namespace TestBackend.Utils
 		public static string GetToken(User userInfo, IConfiguration config)
         {
 			string secretKey = config["Jwt:SecretKey"];
-			string Issuer = config["Jwt:Isuser"];
+			string Issuer = config["Jwt:Issuer"];
 			string Audience = config["Jwt:Audience"];
 
 			var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
@@ -31,6 +31,21 @@ namespace TestBackend.Utils
 				signingCredentials: credentials
 				) ;
 			return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+		public static int GetTokenIdUser(ClaimsIdentity identity)
+        {
+            if (identity!=null)
+            {
+				IEnumerable<Claim> claims = identity.Claims;
+                foreach (var claim in claims)
+                {
+                    if (claim.Type == "idUsuario")
+                    {
+						return int.Parse(claim.Value);
+					}
+				}
+            }
+			return 0;
         }
 	}
 }

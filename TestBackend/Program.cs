@@ -1,4 +1,7 @@
 ﻿global using Microsoft.EntityFrameworkCore;
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using TestBackend.Domain.IRepository;
 using TestBackend.Domain.IServices;
 using TestBackend.Persistence.Context;
@@ -6,6 +9,7 @@ using TestBackend.Persistence.Repository;
 using TestBackend.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+//var key = AsymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"]));
 
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("Conexion");
@@ -25,6 +29,21 @@ builder.Services.AddCors(options => options.AddPolicy("AllowWebApp",
                                     bldr => bldr.AllowAnyOrigin()
                                                 .AllowAnyHeader()
                                                 .AllowAnyMethod()));
+//Add authentication
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(
+    options =>
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"])),
+        ClockSkew = TimeSpan.Zero
+    });
+
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -40,6 +59,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors("AllowWebApp");
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
