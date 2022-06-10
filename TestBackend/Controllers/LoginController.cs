@@ -28,7 +28,7 @@ namespace TestBackend.Controllers
                 {
                     return BadRequest(new { message = "Usuario o contraseña inválida" });
                 }
-                string tokenString = JwtConfigurator.GetToken(user, _config);
+                string tokenString = JwtConfigurator.GetToken(usr, _config);
                 //return Ok(new { usuario = usr.NameUser });
                 return Ok(new { token = tokenString });
             }
